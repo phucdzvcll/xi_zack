@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import 'events/create_room/di.dart';
+import 'events/disconnect_handler/di.dart';
+import 'events/join_room/di.dart';
 import 'events/join_to_lobby/di.dart';
 
 Future<void> appDI(GetIt injector) async {
@@ -20,4 +22,6 @@ Future<void> appDI(GetIt injector) async {
   injector.registerLazySingleton<Db>(() => db);
   joinToLobbyDi(injector);
   createRoomDi(injector);
+  joinRoomDi(injector);
+  disconnectHandlerDi(injector);
 }

@@ -3,6 +3,8 @@ import 'package:socket_io/socket_io.dart';
 
 import 'di.dart';
 import 'events/create_room/create_room_handler.dart';
+import 'events/disconnect_handler/disconnect_handler.dart';
+import 'events/join_room/join_room_handler.dart';
 import 'events/join_to_lobby/join_to_lobby_handler.dart';
 
 final getIt = GetIt.instance;
@@ -19,8 +21,16 @@ Future<void> _systemInit(GetIt injector) async {
       getIt.get<JoinToLobbyHandler>().joinToLobby(server, socket, data);
     });
 
-    socket.on("createRoom",(data){
+    socket.on("createRoom", (data) {
       getIt.get<CreateRoomHandler>().createRoom(server, socket, data);
+    });
+
+    socket.on("joinRoom", (data) {
+      getIt.get<JoinRoomHandler>().joinRoom(server, socket, data);
+    });
+
+    socket.on("disconnect", (data) {
+      getIt.get<DisconnectHandler>().handler(server, socket);
     });
   });
   server.listen(8082);

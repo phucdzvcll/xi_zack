@@ -2,7 +2,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:socket_io/socket_io.dart';
 
 import '../join_to_lobby/join_to_lobby_handler.dart';
-import 'room_model.dart';
+import 'room_param.dart';
 
 class CreateRoomHandler {
   final Db db;
@@ -17,7 +17,7 @@ class CreateRoomHandler {
 
   Future<void> createRoom(
       Server server, Socket socket, Map<String, dynamic> data) async {
-    final Room room = Room.fromJson(data);
+    final RoomParam room = RoomParam.fromJson(data);
 
     //create a roomId with uuid v4
     var roomId = uuid.v4();
@@ -34,5 +34,8 @@ class CreateRoomHandler {
     await roomColl.insertOne(roomCreated);
 
     joinToLobbyHandler.joinToLobby(server, socket, data);
+    socket.emit("createRoomSuccess", {
+      "roomId": roomId,
+    });
   }
 }

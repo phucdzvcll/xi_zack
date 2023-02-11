@@ -2,13 +2,13 @@ import 'package:equatable/equatable.dart';
 
 import '../../common/object_parse_ext.dart';
 
-class Room extends Equatable {
+class RoomParam extends Equatable {
     final String? roomName;
 
-    Room({this.roomName,});
+    RoomParam({this.roomName,});
 
-    factory Room.fromJson(Map<String, dynamic> json) {
-        return Room(
+    factory RoomParam.fromJson(Map<String, dynamic> json) {
+        return RoomParam(
             roomName: json.parseString('roomName'),
         );
     }
