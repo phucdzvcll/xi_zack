@@ -1,15 +1,18 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:socket_io/socket_io.dart';
 
+import '../join_to_lobby/join_to_lobby_handler.dart';
 import 'room_model.dart';
 
 class CreateRoomHandler {
   final Db db;
   final Uuid uuid;
+  final JoinToLobbyHandler joinToLobbyHandler;
 
   CreateRoomHandler({
     required this.db,
     required this.uuid,
+    required this.joinToLobbyHandler,
   });
 
   Future<void> createRoom(
@@ -28,13 +31,8 @@ class CreateRoomHandler {
       "roomName": room.roomName,
       "dateTime": DateTime.now().millisecondsSinceEpoch
     };
-    roomColl.insertOne(roomCreated);
+    await roomColl.insertOne(roomCreated);
 
-    //emit mess notify create room success to client
-    socket.emit("createRoomSuccess", roomCreated);
-
-    //re-get all room and emit to players
-    final romDBO = await roomColl.find(where.sortBy('dateTime')).toList();
-    server.emit("newRoomCreated", romDBO);
+    joinToLobbyHandler.joinToLobby(server, socket, data);
   }
 }
