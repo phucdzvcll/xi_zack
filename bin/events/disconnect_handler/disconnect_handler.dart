@@ -8,7 +8,7 @@ class DisconnectHandler {
     required this.db,
   });
 
-  void handler(Server server, Socket client) async {
+  Future<void> handler(Server server, Socket client) async {
     var collection = db.collection("room");
     var selector = {};
     var update = {

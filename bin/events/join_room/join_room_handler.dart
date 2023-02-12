@@ -1,18 +1,20 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:socket_io/socket_io.dart';
+import '../join_to_lobby/join_to_lobby_handler.dart';
 import 'join_room_param.dart';
 
 class JoinRoomHandler {
   final Db db;
+  final JoinToLobbyHandler joinToLobbyHandler;
 
   JoinRoomHandler({
     required this.db,
+    required this.joinToLobbyHandler,
   });
 
   Future<void> joinRoom(
       Server server, Socket socket, Map<String, dynamic> data) async {
     final JoinRoomParam roomParam = JoinRoomParam.fromJson(data);
-
     var collection = db.collection("room");
     var query = {'roomId': roomParam.roomId};
     print(query);
@@ -42,6 +44,5 @@ class JoinRoomHandler {
       }
       await collection.update(result, update);
     }
-    print(result);
   }
 }

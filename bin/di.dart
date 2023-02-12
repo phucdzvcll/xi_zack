@@ -7,6 +7,7 @@ import 'events/create_room/di.dart';
 import 'events/disconnect_handler/di.dart';
 import 'events/join_room/di.dart';
 import 'events/join_to_lobby/di.dart';
+import 'events/on_lobby_change/di.dart';
 
 Future<void> appDI(GetIt injector) async {
   injector.registerLazySingleton<Uuid>(() => Uuid());
@@ -20,6 +21,7 @@ Future<void> appDI(GetIt injector) async {
   Db db = Db("mongodb://$host:$port/xi_dach");
   await db.open();
   injector.registerLazySingleton<Db>(() => db);
+  onLobbyChangeDi(injector);
   joinToLobbyDi(injector);
   createRoomDi(injector);
   joinRoomDi(injector);

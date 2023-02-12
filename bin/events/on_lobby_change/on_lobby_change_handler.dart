@@ -1,17 +1,16 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:socket_io/socket_io.dart';
 
-class JoinToLobbyHandler {
+class OnLobbyChangeHandler {
   final Db db;
 
-  JoinToLobbyHandler({
+  OnLobbyChangeHandler({
     required this.db,
   });
 
-  Future<void> joinToLobby(
-      Server io, Socket client, Map<String, dynamic> data) async {
+  Future<void> handle(Socket socket) async {
     final room = db.collection("room");
     final romDBO = await room.find(where.sortBy('dateTime')).toList();
-    client.emit("joinToLobbySuccess", romDBO);
+    socket.broadcast.emit("joinToLobbySuccess", romDBO);
   }
 }

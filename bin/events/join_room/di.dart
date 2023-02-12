@@ -6,6 +6,7 @@ void joinRoomDi(GetIt injector) {
   injector.registerFactory<JoinRoomHandler>(
     () => JoinRoomHandler(
       db: injector.get(),
+      joinToLobbyHandler: injector.get(),
     ),
   );
 }

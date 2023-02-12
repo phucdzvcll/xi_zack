@@ -18,22 +18,21 @@ class CreateRoomHandler {
   Future<void> createRoom(
       Server server, Socket socket, Map<String, dynamic> data) async {
     final RoomParam room = RoomParam.fromJson(data);
-
-    //create a roomId with uuid v4
     var roomId = uuid.v4();
-    server.sockets.rooms.add(roomId);
-    //join to room after created a room
-    socket.join(roomId);
-    //save room to db
     final roomColl = db.collection("room");
     var roomCreated = {
       "roomId": roomId,
       "roomName": room.roomName,
-      "dateTime": DateTime.now().millisecondsSinceEpoch
+      "dateTime": DateTime.now().millisecondsSinceEpoch,
+      "players": [
+        {
+          'socketId': socket.id,
+          'playerId': room.playerId,
+        }
+      ]
     };
     await roomColl.insertOne(roomCreated);
-
-    joinToLobbyHandler.joinToLobby(server, socket, data);
+    server.sockets.rooms.add(roomId);
     socket.emit("createRoomSuccess", {
       "roomId": roomId,
     });
