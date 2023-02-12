@@ -7,6 +7,7 @@ void joinRoomDi(GetIt injector) {
     () => JoinRoomHandler(
       db: injector.get(),
       joinToLobbyHandler: injector.get(),
+      sqlConnection: injector.get(),
     ),
   );
 }

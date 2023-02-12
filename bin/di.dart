@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:get_it/get_it.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mysql1/mysql1.dart';
 
 import 'events/create_room/di.dart';
 import 'events/disconnect_handler/di.dart';
@@ -20,6 +21,25 @@ Future<void> appDI(GetIt injector) async {
   //     Platform.environment['MONGO_INITDB_ROOT_PASSWORD'] ?? 'example';
   Db db = Db("mongodb://$host:$port/xi_dach");
   await db.open();
+
+  Map<String, String> envVars = Platform.environment;
+
+  var sqlHost = envVars['MYSQL_HOSTS'] ?? 'localhost';
+  var sqlPort = int.parse(envVars['MYSQL_PORT'] ?? '3306');
+  var dbPassword = envVars['MYSQL_PASS'] ?? '1';
+  var dbName = envVars['MYSQL_DB_NAME'] ?? 'mydb';
+  var dbUser = envVars['MYSQL_USER'] ?? 'root';
+  final settings = ConnectionSettings(
+    port: sqlPort,
+    password: dbPassword,
+    db: dbName,
+    user: dbUser,
+    host: sqlHost,
+  );
+  MySqlConnection connection = await MySqlConnection.connect(settings);
+
+  injector.registerLazySingleton(() => connection);
+
   injector.registerLazySingleton<Db>(() => db);
   onLobbyChangeDi(injector);
   joinToLobbyDi(injector);

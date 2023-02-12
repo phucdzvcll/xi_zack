@@ -24,17 +24,12 @@ class CreateRoomHandler {
       "roomId": roomId,
       "roomName": room.roomName,
       "dateTime": DateTime.now().millisecondsSinceEpoch,
-      "players": [
-        {
-          'socketId': socket.id,
-          'playerId': room.playerId,
-        }
-      ]
     };
     await roomColl.insertOne(roomCreated);
     server.sockets.rooms.add(roomId);
     socket.emit("createRoomSuccess", {
       "roomId": roomId,
+      "roomName": room.roomName,
     });
   }
 }
