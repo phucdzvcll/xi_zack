@@ -8,23 +8,24 @@ import 'events/create_room/di.dart';
 import 'events/disconnect_handler/di.dart';
 import 'events/join_room/di.dart';
 import 'events/join_to_lobby/di.dart';
+import 'events/leave_room/di.dart';
 import 'events/on_lobby_change/di.dart';
 
 Future<void> appDI(GetIt injector) async {
   injector.registerLazySingleton<Uuid>(() => Uuid());
 
-  String host = Platform.environment['MONGO_DART_DRIVER_HOST'] ?? '127.0.0.1';
+  String host =
+      Platform.environment['MONGO_DART_DRIVER_HOST'] ?? '35.240.138.79';
   String port = Platform.environment['MONGO_DART_DRIVER_PORT'] ?? '27017';
   // String userName =
   //     Platform.environment['MONGO_INITDB_ROOT_USERNAME'] ?? 'root';
   // String password =
   //     Platform.environment['MONGO_INITDB_ROOT_PASSWORD'] ?? 'example';
-  Db db = Db("mongodb://$host:$port/xi_dach");
+  Db db = Db("mongodb://35.240.138.79:27017/xi_dach");
   await db.open();
 
   Map<String, String> envVars = Platform.environment;
 
-  var sqlHost = envVars['MYSQL_HOSTS'] ?? 'localhost';
   var sqlPort = int.parse(envVars['MYSQL_PORT'] ?? '3306');
   var dbPassword = envVars['MYSQL_PASS'] ?? '1';
   var dbName = envVars['MYSQL_DB_NAME'] ?? 'mydb';
@@ -34,7 +35,7 @@ Future<void> appDI(GetIt injector) async {
     password: dbPassword,
     db: dbName,
     user: dbUser,
-    host: sqlHost,
+    host: host,
   );
   MySqlConnection connection = await MySqlConnection.connect(settings);
 
@@ -46,4 +47,5 @@ Future<void> appDI(GetIt injector) async {
   createRoomDi(injector);
   joinRoomDi(injector);
   disconnectHandlerDi(injector);
+  leaveRoomDi(injector);
 }

@@ -16,12 +16,23 @@ class DisconnectHandler {
         'players': {'socketId': client.id}
       }
     };
-    final room = await _getCurrentRoom(client, collection);
-    List<String> roomIds = room.map((e) => e['roomId'] as String).toList();
-    for (String element in roomIds) {
-      client.leave(element, (data) {
-        client.broadcast.to(element).emit('userLeave', {"socketId": client.id});
-      });
+    final rooms = await _getCurrentRoom(client, collection);
+
+    for (Map<String, dynamic> element in rooms) {
+      try {
+        final socketId = client.id;
+        final player = element['players']
+            .firstWhere((p) => p['socketId'] == socketId, orElse: () => null);
+
+        print(player);
+        server.to(element['roomId']).emit(
+              'userLeave',
+              player,
+            ); // {playerId: 1, socketId: a1bfedd0ac4e11eda39ab7a704ed848c, isAdmin: false}
+        client.leave(element['roomId'], null);
+      } catch (e) {
+        print(e);
+      }
     }
 
     await collection.update(selector, update);

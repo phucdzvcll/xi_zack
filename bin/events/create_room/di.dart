@@ -7,7 +7,6 @@ void createRoomDi(GetIt injector) {
     () => CreateRoomHandler(
       db: injector.get(),
       uuid: injector.get(),
-      joinToLobbyHandler: injector.get(),
     ),
   );
 }

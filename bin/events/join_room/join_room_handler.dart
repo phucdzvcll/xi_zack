@@ -1,18 +1,15 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:socket_io/socket_io.dart';
-import '../join_to_lobby/join_to_lobby_handler.dart';
 import 'join_room_param.dart';
 import 'model/player.dart';
 
 class JoinRoomHandler {
   final Db db;
   final MySqlConnection sqlConnection;
-  final JoinToLobbyHandler joinToLobbyHandler;
 
   JoinRoomHandler({
     required this.db,
-    required this.joinToLobbyHandler,
     required this.sqlConnection,
   });
 
@@ -25,7 +22,7 @@ class JoinRoomHandler {
     var result = await collection.findOne(query);
     if (result != null && roomParam.socketId != null) {
       PlayerInRoom player = PlayerInRoom(
-          socketId: roomParam.socketId ?? "",
+          socketId: roomParam.socketId ?? socket.id,
           playerId: roomParam.playerId ?? "",
           isAdmin: false);
       var update;
@@ -61,7 +58,9 @@ class JoinRoomHandler {
 
       socket.emit("joinRoomSuccess", players.map((e) => e.toJson()).toList());
       socket.join(roomParam.roomId);
-      socket.broadcast.emit("newPlayerJoined", player.toJson());
+      socket.broadcast
+          .to(roomParam.roomId ?? "")
+          .emit("newPlayerJoined", player.toJson());
     } else {
       socket.emit("socketError", {"mess": "room error"});
     }

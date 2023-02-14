@@ -1,18 +1,15 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:socket_io/socket_io.dart';
 
-import '../join_to_lobby/join_to_lobby_handler.dart';
 import 'room_param.dart';
 
 class CreateRoomHandler {
   final Db db;
   final Uuid uuid;
-  final JoinToLobbyHandler joinToLobbyHandler;
 
   CreateRoomHandler({
     required this.db,
     required this.uuid,
-    required this.joinToLobbyHandler,
   });
 
   Future<void> createRoom(
