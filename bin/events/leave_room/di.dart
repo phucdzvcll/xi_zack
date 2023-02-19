@@ -4,5 +4,8 @@ import 'leave_room_handler.dart';
 
 void leaveRoomDi(GetIt injector) {
   injector.registerFactory<LeaveRoomHandler>(
-      () => LeaveRoomHandler(db: injector.get()));
+    () => LeaveRoomHandler(
+      db: injector.get(),
+    ),
+  );
 }

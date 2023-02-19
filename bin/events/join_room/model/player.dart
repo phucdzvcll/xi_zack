@@ -6,7 +6,7 @@ class PlayerInRoom {
   PlayerInRoom({
     required this.playerId,
     required this.socketId,
-    required this.isAdmin,
+    this.isAdmin = false,
   });
 
   factory PlayerInRoom.fromJson(Map<String, dynamic> json) {
@@ -18,6 +18,14 @@ class PlayerInRoom {
   }
 
   Map<String, dynamic> toJson() {
+    return {
+      "playerId": playerId,
+      "socketId": socketId,
+      "isAdmin": isAdmin,
+    };
+  }
+
+  Map<String, dynamic> toJsonAdmin() {
     return {
       "playerId": playerId,
       "socketId": socketId,

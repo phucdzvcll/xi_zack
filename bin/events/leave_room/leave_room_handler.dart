@@ -21,16 +21,32 @@ class LeaveRoomHandler {
           'players': {'socketId': client.id}
         }
       };
-      var query = {'roomId': roomId};
-      Map<String, dynamic>? result = await collection.findOne(query);
-      if (result != null && playerId != null) {
+
+      if (playerId != null) {
         await collection.update(selector, update);
         client.broadcast.to(roomId).emit('userLeave', {
           "socketId": client.id,
           "playerId": playerId,
           "isAdmin": isAdmin ?? false,
         });
+        final filter = where.eq('roomId', roomId).eq(
+              'admin.playerId',
+              playerId,
+            );
+
+        final updateAdmin = modify.set('admin', null);
+
+        await collection.updateOne(filter, updateAdmin);
+
         client.leave(roomId, null);
+      }
+
+      final emptyFilter = where
+          .eq('roomId', roomId)
+          .and(where.eq('players', []).or(where.eq('players', null)));
+      final emptyDoc = await collection.findOne(emptyFilter);
+      if (emptyDoc != null) {
+        await collection.deleteOne(emptyFilter);
       }
     }
   }

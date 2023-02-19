@@ -1,6 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:socket_io/socket_io.dart';
+import '../../utils/extensions.dart';
 import 'join_room_param.dart';
 import 'model/player.dart';
 
@@ -18,15 +19,15 @@ class JoinRoomHandler {
     final JoinRoomParam roomParam = JoinRoomParam.fromJson(data);
     var collection = db.collection("room");
     var query = {'roomId': roomParam.roomId};
-    print(query);
     var result = await collection.findOne(query);
-    if (result != null && roomParam.socketId != null) {
-      PlayerInRoom player = PlayerInRoom(
-          socketId: roomParam.socketId ?? socket.id,
-          playerId: roomParam.playerId ?? "",
-          isAdmin: false);
+    PlayerInRoom player;
+    if (result != null) {
       var update;
       if (result['players'] != null) {
+        player = PlayerInRoom(
+          socketId: roomParam.socketId ?? socket.id,
+          playerId: roomParam.playerId ?? "",
+        );
         update = {
           '\$push': {
             'players': player.toJson(),
@@ -34,9 +35,10 @@ class JoinRoomHandler {
         };
       } else {
         player = PlayerInRoom(
-            playerId: player.playerId,
-            socketId: roomParam.socketId ?? socket.id,
-            isAdmin: true);
+          socketId: roomParam.socketId ?? socket.id,
+          playerId: roomParam.playerId ?? "",
+          isAdmin: true,
+        );
         update = {
           '\$set': {
             "players": [
@@ -46,23 +48,21 @@ class JoinRoomHandler {
         };
       }
       await collection.update(result, update);
-      List<PlayerInRoom> players = [];
-      if (result['players'] != null) {
-        final List<PlayerInRoom> s = (result['players'] as List)
-            .map((e) => PlayerInRoom.fromJson(e))
-            .toList();
-        players.addAll(s);
-      }
 
-      players.add(player);
+      final filter = where.eq('roomId', roomParam.roomId);
 
+      final cursor = await collection.findOne(filter);
+
+      List<PlayerInRoom> players = (((cursor ?? {})["players"] ?? []) as List)
+          .map((e) => PlayerInRoom.fromJson(e))
+          .toList();
       socket.emit("joinRoomSuccess", players.map((e) => e.toJson()).toList());
       socket.join(roomParam.roomId);
       socket.broadcast
           .to(roomParam.roomId ?? "")
           .emit("newPlayerJoined", player.toJson());
     } else {
-      socket.emit("socketError", {"mess": "room error"});
+      socket.emitError("room error");
     }
   }
 }

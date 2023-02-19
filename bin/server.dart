@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:socket_io/socket_io.dart' as IO;
 
 import 'di.dart';
+import 'events/change_admin_handler/change_admin_handler.dart';
 import 'events/create_room/create_room_handler.dart';
 import 'events/disconnect_handler/disconnect_handler.dart';
 import 'events/join_room/join_room_handler.dart';
@@ -18,29 +19,48 @@ void main(List<String> args) async {
 Future<void> _systemInit(GetIt injector) async {
   await appDI(injector);
   var server = IO.Server();
-  server.on("connection", (socket) {
+  server.on("connection", (socket) async {
     socket.on("joinToLobby", (data) async {
-      await getIt.get<JoinToLobbyHandler>().joinToLobby(server, socket, data);
+      final joinToLobbyHandler = getIt.get<JoinToLobbyHandler>();
+
+      await joinToLobbyHandler.joinToLobby(server, socket, data);
     });
 
     socket.on("createRoom", (data) async {
-      await getIt.get<CreateRoomHandler>().createRoom(server, socket, data);
-      await getIt.get<OnLobbyChangeHandler>().handle(socket, server);
+      final onLobbyChangeHandler = getIt.get<OnLobbyChangeHandler>();
+      final createRoomHandler = getIt.get<CreateRoomHandler>();
+
+      await createRoomHandler.createRoom(server, socket, data);
+      await onLobbyChangeHandler.handle(socket, server);
     });
 
     socket.on("joinRoom", (data) async {
-      await getIt.get<JoinRoomHandler>().joinRoom(server, socket, data);
-      await getIt.get<OnLobbyChangeHandler>().handle(socket, server);
+      final onLobbyChangeHandler = getIt.get<OnLobbyChangeHandler>();
+      final joinRoomHandler = getIt.get<JoinRoomHandler>();
+
+      await joinRoomHandler.joinRoom(server, socket, data);
+      await onLobbyChangeHandler.handle(socket, server);
     });
 
     socket.on("disconnect", (data) async {
-      await getIt.get<DisconnectHandler>().handler(server, socket);
-      await getIt.get<OnLobbyChangeHandler>().handle(socket, server);
+      final onLobbyChangeHandler = getIt.get<OnLobbyChangeHandler>();
+      final disconnectHandler = getIt.get<DisconnectHandler>();
+
+      await disconnectHandler.handler(server, socket);
+      await onLobbyChangeHandler.handle(socket, server);
     });
 
     socket.on("leaveRoom", (data) async {
-      await getIt.get<LeaveRoomHandler>().handle(server, socket, data);
-      await getIt.get<OnLobbyChangeHandler>().handle(socket, server);
+      final leaveRoomHandler = getIt.get<LeaveRoomHandler>();
+
+      final onLobbyChangeHandler = getIt.get<OnLobbyChangeHandler>();
+      await leaveRoomHandler.handle(server, socket, data);
+      await onLobbyChangeHandler.handle(socket, server);
+    });
+
+
+    socket.on("changeAdmin", (data) async {
+      await getIt.get<ChangeAdminHandler>().handle(server, socket, data);
     });
   });
   server.listen(8082);
