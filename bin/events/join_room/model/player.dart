@@ -2,10 +2,12 @@ class PlayerInRoom {
   final String playerId;
   final String socketId;
   final bool isAdmin;
+  final int index;
 
   PlayerInRoom({
     required this.playerId,
     required this.socketId,
+    required this.index,
     this.isAdmin = false,
   });
 
@@ -14,6 +16,7 @@ class PlayerInRoom {
       playerId: json['playerId'],
       socketId: json["socketId"],
       isAdmin: json["isAdmin"],
+      index: json["index"],
     );
   }
 
@@ -22,6 +25,7 @@ class PlayerInRoom {
       "playerId": playerId,
       "socketId": socketId,
       "isAdmin": isAdmin,
+      "index": index,
     };
   }
 
@@ -30,6 +34,7 @@ class PlayerInRoom {
       "playerId": playerId,
       "socketId": socketId,
       "isAdmin": isAdmin,
+      "index": index,
     };
   }
 }

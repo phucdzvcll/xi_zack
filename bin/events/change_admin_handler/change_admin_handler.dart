@@ -28,7 +28,8 @@ class ChangeAdminHandler {
         'players.playerId': playerId,
       };
 
-      final update = modify.set('players.\$.isAdmin', true);
+      final update =
+          modify.set('players.\$.isAdmin', true).set('players.\$.index', 0);
 
       final result = await rooms.updateOne(query, update);
 
