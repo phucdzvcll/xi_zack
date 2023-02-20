@@ -58,9 +58,28 @@ Future<void> _systemInit(GetIt injector) async {
       await onLobbyChangeHandler.handle(socket, server);
     });
 
-
     socket.on("changeAdmin", (data) async {
       await getIt.get<ChangeAdminHandler>().handle(server, socket, data);
+    });
+
+    socket.on("playerReady", (data) {
+      String? roomId = data['roomId'];
+      String? playerId = data['playerId'];
+      if (roomId != null && playerId != null) {
+        server.to(roomId).emit("playerReady", {
+          'playerId': playerId,
+        });
+      }
+    });
+
+    socket.on("playerCancelReady", (data) {
+      String? roomId = data['roomId'];
+      String? playerId = data['playerId'];
+      if (roomId != null && playerId != null) {
+        server.to(roomId).emit("playerCancelReady", {
+          'playerId': playerId,
+        });
+      }
     });
   });
   server.listen(8082);
