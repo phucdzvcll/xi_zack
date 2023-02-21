@@ -3,7 +3,7 @@ import 'package:mysql1/mysql1.dart';
 import 'package:socket_io/socket_io.dart';
 import '../../utils/extensions.dart';
 import 'join_room_param.dart';
-import 'model/player.dart';
+import 'models/player.dart';
 
 class JoinRoomHandler {
   final Db db;
@@ -16,7 +16,7 @@ class JoinRoomHandler {
 
   Future<void> joinRoom(
       Server server, Socket socket, Map<String, dynamic> data) async {
-    try{
+    try {
       final JoinRoomParam roomParam = JoinRoomParam.fromJson(data);
       var collection = db.collection("room");
       var query = {'roomId': roomParam.roomId};
@@ -27,24 +27,29 @@ class JoinRoomHandler {
 
         if (result['players'] != null) {
           final playersIndexes =
-          Set<int>.from(result['players'].map((p) => p['index'] as int));
+              Set<int>.from(result['players'].map((p) => p['index'] as int));
           int index = 1;
           while (playersIndexes.contains(index)) {
             index++;
+            if (index >= 10) {
+              throw "room is full";
+            }
           }
           player = PlayerInRoom(
             socketId: roomParam.socketId ?? socket.id,
             playerId: roomParam.playerId ?? "",
             index: index,
+            pet: 10,
           );
           update = modify.push('players', player.toJson());
         } else {
-          int index = 0;
+          int index = 10;
           player = PlayerInRoom(
             socketId: roomParam.socketId ?? socket.id,
             playerId: roomParam.playerId ?? "",
             isAdmin: true,
             index: index,
+            pet: 10,
           );
 
           update = modify.set('players', [
@@ -68,7 +73,7 @@ class JoinRoomHandler {
       } else {
         socket.emitError("room error");
       }
-    }catch (e){
+    } catch (e) {
       socket.emitError(e.toString());
     }
   }

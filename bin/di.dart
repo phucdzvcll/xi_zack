@@ -7,6 +7,8 @@ import 'package:mysql1/mysql1.dart';
 import 'events/change_admin_handler/di.dart';
 import 'events/create_room/di.dart';
 import 'events/disconnect_handler/di.dart';
+import 'events/game_handler/pet_handler/di.dart';
+import 'events/game_handler/start_game/di.dart';
 import 'events/join_room/di.dart';
 import 'events/join_to_lobby/di.dart';
 import 'events/leave_room/di.dart';
@@ -49,4 +51,6 @@ Future<void> appDI(GetIt injector) async {
   disconnectHandlerDi(injector);
   leaveRoomDi(injector);
   onChangeAdminDi(injector);
+  startNewGameInjector(injector);
+  petInjector(injector);
 }

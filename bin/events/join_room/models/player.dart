@@ -3,11 +3,13 @@ class PlayerInRoom {
   final String socketId;
   final bool isAdmin;
   final int index;
+  final int pet;
 
   PlayerInRoom({
     required this.playerId,
     required this.socketId,
     required this.index,
+    required this.pet,
     this.isAdmin = false,
   });
 
@@ -17,6 +19,7 @@ class PlayerInRoom {
       socketId: json["socketId"],
       isAdmin: json["isAdmin"],
       index: json["index"],
+      pet: json["pet"],
     );
   }
 
@@ -26,15 +29,7 @@ class PlayerInRoom {
       "socketId": socketId,
       "isAdmin": isAdmin,
       "index": index,
-    };
-  }
-
-  Map<String, dynamic> toJsonAdmin() {
-    return {
-      "playerId": playerId,
-      "socketId": socketId,
-      "isAdmin": isAdmin,
-      "index": index,
+      "pet": pet,
     };
   }
 }
