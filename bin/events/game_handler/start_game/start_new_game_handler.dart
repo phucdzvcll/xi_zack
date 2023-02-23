@@ -31,7 +31,7 @@ class StartNewGameHandler {
             .map((e) => PlayerDetail.fromJson(e))
             .toList();
 
-        for (var element in playerDetails) {
+        for (PlayerDetail element in playerDetails) {
           final PokerCard pokerCard = pokerCards.removeAt(0);
           element.cards.add(pokerCard);
         }
@@ -44,10 +44,18 @@ class StartNewGameHandler {
           gameId: uuid.v4(),
           roomId: roomId,
           playerDetail: playerDetails,
+          currentCards: pokerCards,
         );
         await gameCollection.insertOne(newGame.toJson());
 
         server.to(roomId).emit("newGame", newGame.toJson());
+        PlayerDetail minPlayer = playerDetails
+            .reduce((a, b) => (a.index ?? 0) < (b.index ?? 0) ? a : b);
+
+        server.to(roomId).emit(
+              "nextTurn",
+              minPlayer.toJson(),
+            );
       } else {
         throw "room not found";
       }

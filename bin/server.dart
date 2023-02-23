@@ -5,7 +5,9 @@ import 'di.dart';
 import 'events/change_admin_handler/change_admin_handler.dart';
 import 'events/create_room/create_room_handler.dart';
 import 'events/disconnect_handler/disconnect_handler.dart';
+import 'events/game_handler/next_turn/next_turn_handler.dart';
 import 'events/game_handler/pet_handler/pet_handler.dart';
+import 'events/game_handler/pull_card/pull_card_handler.dart';
 import 'events/game_handler/start_game/start_new_game_handler.dart';
 import 'events/join_room/join_room_handler.dart';
 import 'events/join_to_lobby/join_to_lobby_handler.dart';
@@ -89,6 +91,14 @@ Future<void> _systemInit(GetIt injector) async {
 
     socket.on("playerPet", (data) async {
       await getIt.get<PetHandler>().handle(server, socket, data);
+    });
+
+    socket.on("pullCard", (data) async {
+      await getIt.get<PullCardHandler>().handle(server, socket, data);
+    });
+
+    socket.on("nextTurn", (data) async {
+      await getIt.get<NextTurnHandler>().handle(server, socket, data);
     });
   });
   server.listen(8082);
