@@ -39,7 +39,7 @@ class ChangeAdminHandler {
         });
         socket.emit("changeAdminSuccess", {});
       } else {
-        socket.error(result.errmsg ?? "Something went wrong!");
+        socket.emitError(result.errmsg ?? "Something went wrong!");
       }
     } catch (e) {
       socket.emitError(e.toString());
