@@ -36,13 +36,22 @@ class NextTurnHandler {
         PlayerDetail currentPlayer =
             players.firstWhere((p) => p.playerId == playerId);
 
-        PlayerDetail minPlayer = players
-            .where((p) => (p.index ?? 0) < (currentPlayer.index ?? 0))
-            .reduce((a, b) => (a.index ?? 0) < (b.index ?? 0) ? a : b);
-        server.to(roomId).emit(
-              "nextTurn",
-              minPlayer.toJson(),
-            );
+        int currentIndex = currentPlayer.index ?? -1;
+
+        List<PlayerDetail> indexMoreThan = players
+            .where((element) => (element.index ?? -1) > (currentIndex))
+            .toList();
+        if (indexMoreThan.isNotEmpty) {
+          PlayerDetail playerDetail = indexMoreThan.reduce((PlayerDetail value,
+                  PlayerDetail element) =>
+              (value.index ?? -1) < (element.index ?? -1) ? value : element);
+          server.to(roomId).emit(
+                "nextTurn",
+                playerDetail.toJson(),
+              );
+        } else {
+          socket.emitError("Player Not Found");
+        }
       } else {
         socket.emitError("Game Not Found");
       }
